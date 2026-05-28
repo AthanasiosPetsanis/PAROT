@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>gaussian_splatting</name>
+  <version>0.0.1</version>
+  <description>Gaussian splatting node for IROS_2026 project.</description>
+
+  <maintainer email="you@example.com">Your Name</maintainer>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>rospy</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>nav_msgs</depend>
+
+  <!-- Not strictly required but harmless -->
+  <exec_depend>python3</exec_depend>
+
+</package>

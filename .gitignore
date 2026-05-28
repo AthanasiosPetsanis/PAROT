@@ -1,0 +1,65 @@
+# Ignore image files
+*.png
+*.jpg
+!assets/PAROT_overview.png
+
+# Ignore log files
+*.log
+*.txt
+!CMakeLists.txt
+
+# Ignore CloudCompare files
+*.bin
+
+# Ignore non-method stuff
+*.zip
+*.xlsx
+/.codex
+/LLM_METHOD_REPORT.md
+/depthsort_idea
+/instructions.txt
+/prompt.txt
+/subsample_images.py
+/tmux_IROS_2026.sh
+/testing/
+/profiling/
+
+# Ignore AirSim and Unreal project folders
+AirSim_clean/
+UE4_Projects/
+.catkin_tools/
+
+# Ignore expirements
+Experiments/
+
+# ROS build artifacts
+build/
+devel/
+logs/
+poses/
+.bag/
+*.bag
+*.bag.active
+
+# Python cache
+__pycache__/
+*.pyc
+
+# SFM evaluator generated outputs
+/testing/sfm_eval/**/__pycache__/
+/testing/sfm_eval/**/*.pyc
+/testing/sfm_eval/results/*
+!/testing/sfm_eval/results/.gitkeep
+
+# Runtime reconstruction/planning outputs
+/RT_meshing/Mesh_Space/RTmesh_test0/*.npz
+/RT_meshing/Mesh_Space/RTmesh_test0/lkh_plan/nbv_plan_current.*
+
+# Runtime depth frame captures
+/depth/*.npy
+
+# 3D Gaussians
+/GaussianSplatting/
+*.splat
+
+Experiments/

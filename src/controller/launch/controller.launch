@@ -1,0 +1,11 @@
+<launch>
+  <node pkg="controller"
+        type="controller_v01.py"
+        name="controller_node"
+        output="screen">
+
+    <param name="frame_id" value="odom_local_ned" />
+    <!-- Load params into the controller_node private namespace -->
+    <rosparam file="$(find controller)/config/controller.yaml" command="load" />
+  </node>
+</launch>

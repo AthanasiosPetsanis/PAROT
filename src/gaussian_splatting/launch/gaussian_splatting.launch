@@ -1,0 +1,11 @@
+<launch>
+  <!-- New Gaussian Splatting node -->
+  <node pkg="gaussian_splatting"
+        type="gaussian_splatting_node.py"
+        name="gaussian_splatting_node"
+        output="screen">
+
+    <!-- New: gaussian_splatting parameters from the SAME YAML -->
+    <rosparam file="$(find controller)/config/controller.yaml" command="load" />
+  </node>
+</launch>

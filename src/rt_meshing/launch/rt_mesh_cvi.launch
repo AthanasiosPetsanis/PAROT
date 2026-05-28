@@ -1,0 +1,6 @@
+<launch>
+  <node pkg="rt_meshing" type="rt_mesh_cvi_update_node.py" name="rt_mesh_cvi_update" output="screen">
+    <!-- Reuse the same controller.yaml so file paths + intrinsics match -->
+    <rosparam file="$(find controller)/config/controller.yaml" command="load" />
+  </node>
+</launch>

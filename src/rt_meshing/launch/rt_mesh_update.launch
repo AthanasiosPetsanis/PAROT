@@ -1,0 +1,7 @@
+<launch>
+  <!-- Backup launcher for legacy rt_mesh_update_node.py (retired by default). -->
+  <arg name="enable_legacy_mesh_update" default="false" />
+  <node if="$(arg enable_legacy_mesh_update)" pkg="rt_meshing" type="rt_mesh_update_node.py" name="rt_mesh_update" output="screen">
+    <rosparam file="$(find controller)/config/controller.yaml" command="load" />
+  </node>
+</launch>

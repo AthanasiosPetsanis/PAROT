@@ -1,0 +1,31 @@
+<launch>
+  <arg name="run_dir" default="$(env HOME)/Documents/IROS_2026/Experiments/Images/Ours/Church/0" />
+  <arg name="frame_id" default="odom_local_ned" />
+  <arg name="pose_stride" default="20" />
+  <arg name="arrow_length" default="1.2" />
+  <arg name="path_width" default="0.06" />
+  <arg name="center_scale" default="0.18" />
+  <arg name="publish_rate" default="1.0" />
+  <arg name="mesh_npz" default="" />
+
+  <group unless="$(eval mesh_npz != '')">
+    <node pkg="controller"
+          type="visualize_iros_run_rviz.py"
+          name="visualize_iros_run_rviz"
+          output="screen"
+          args="$(arg run_dir) --frame-id $(arg frame_id) --pose-stride $(arg pose_stride) --arrow-length $(arg arrow_length) --path-width $(arg path_width) --center-scale $(arg center_scale) --publish-rate $(arg publish_rate)" />
+  </group>
+
+  <group if="$(eval mesh_npz != '')">
+    <node pkg="controller"
+          type="visualize_iros_run_rviz.py"
+          name="visualize_iros_run_rviz"
+          output="screen"
+          args="$(arg run_dir) --frame-id $(arg frame_id) --pose-stride $(arg pose_stride) --arrow-length $(arg arrow_length) --path-width $(arg path_width) --center-scale $(arg center_scale) --publish-rate $(arg publish_rate) --mesh-npz $(arg mesh_npz)" />
+  </group>
+
+  <node pkg="rviz"
+        type="rviz"
+        name="rviz_iros_run_replay"
+        args="-d $(find controller)/config/iros_run_replay.rviz" />
+</launch>

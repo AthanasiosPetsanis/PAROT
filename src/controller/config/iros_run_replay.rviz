@@ -1,0 +1,196 @@
+Panels:
+  - Class: rviz/Displays
+    Help Height: 191
+    Name: Displays
+    Property Tree Widget:
+      Expanded: ~
+      Splitter Ratio: 0.8247203230857849
+    Tree Height: 2137
+Preferences:
+  PromptSaveOnExit: false
+Toolbars:
+  toolButtonStyle: 2
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Alpha: 0.5
+      Cell Size: 1
+      Class: rviz/Grid
+      Color: 160; 160; 164
+      Enabled: true
+      Line Style:
+        Line Width: 0.029999999329447746
+        Value: Lines
+      Name: Grid
+      Normal Cell Count: 0
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Plane: XY
+      Plane Cell Count: 40
+      Reference Frame: <Fixed Frame>
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /iros_run_replay/actual_flight_path
+      Name: Actual Flight Path
+      Namespaces:
+        iros_replay_actual_path: true
+      Queue Size: 10
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /iros_run_replay/camera_centers
+      Name: Camera Centers
+      Namespaces:
+        iros_replay_camera_centers: true
+      Queue Size: 10
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /iros_run_replay/camera_view_arrows
+      Name: Camera Orientation Vectors
+      Namespaces:
+        iros_replay_camera_view_arrows: true
+      Queue Size: 10
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /iros_run_replay/mesh
+      Name: Optional Mesh
+      Namespaces:
+        iros_replay_mesh: true
+      Queue Size: 10
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/PointCloud2
+      Color: 255; 80; 80
+      Color Transformer: FlatColor
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Min Color: 0; 0; 0
+      Name: Final Geometry Points
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 4
+      Size (m): 0.05000000074505806
+      Style: Points
+      Topic: /iros_run_replay/geometry_points
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: false
+      Value: true
+    - Class: rviz/Marker
+      Enabled: false
+      Marker Topic: /iros_run_replay/sampled_view_vectors
+      Name: Final Sampled View Vectors
+      Namespaces:
+        {}
+      Queue Size: 10
+      Value: false
+    - Class: rviz/Marker
+      Enabled: false
+      Marker Topic: /iros_run_replay/trajectory
+      Name: Final Selected Trajectory
+      Namespaces:
+        {}
+      Queue Size: 10
+      Value: false
+    - Class: rviz/Marker
+      Enabled: false
+      Marker Topic: /iros_run_replay/trajectory_skipped
+      Name: Final Skipped Trajectory
+      Namespaces:
+        {}
+      Queue Size: 10
+      Value: false
+    - Class: rviz/Marker
+      Enabled: false
+      Marker Topic: /iros_run_replay/viewpoint_positions
+      Name: Final Viewpoint Positions
+      Namespaces:
+        {}
+      Queue Size: 10
+      Value: false
+    - Class: rviz/Marker
+      Enabled: false
+      Marker Topic: /iros_run_replay/global_viewpoint_positions
+      Name: Final Global Viewpoint Positions
+      Namespaces:
+        {}
+      Queue Size: 10
+      Value: false
+    - Class: rviz/Marker
+      Enabled: false
+      Marker Topic: /iros_run_replay/current_pose_point
+      Name: Final Current Pose Point
+      Namespaces:
+        {}
+      Queue Size: 10
+      Value: false
+    - Class: rviz/Marker
+      Enabled: false
+      Marker Topic: /iros_run_replay/region_boundaries
+      Name: Final Region Boundaries
+      Namespaces:
+        {}
+      Queue Size: 10
+      Value: false
+  Enabled: true
+  Global Options:
+    Background Color: 48; 48; 48
+    Default Light: true
+    Fixed Frame: odom_local_ned
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz/Interact
+      Hide Inactive Objects: true
+    - Class: rviz/MoveCamera
+    - Class: rviz/Select
+    - Class: rviz/FocusCamera
+  Value: true
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Distance: 31.943464279174805
+      Enable Stereo Rendering:
+        Stereo Eye Separation: 0.05999999865889549
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+        Value: false
+      Field of View: 0.785398006439209
+      Focal Point:
+        X: -0.09904037415981293
+        Y: 4.049067974090576
+        Z: 5.565608978271484
+      Focal Shape Fixed Size: true
+      Focal Shape Size: 0.05000000074505806
+      Invert Z Axis: false
+      Name: Current View
+      Near Clip Distance: 0.009999999776482582
+      Pitch: 0.26000019907951355
+      Target Frame: odom_local_ned
+      Yaw: 1.849995732307434
+    Saved: ~
+Window Geometry:
+  Displays:
+    collapsed: false
+  Height: 2728
+  Hide Left Dock: false
+  Hide Right Dock: false
+  QMainWindow State: 000000ff00000000fd0000000100000000000004ef000009c3fc0200000001fb000000100044006900730070006c006100790073010000009e000009c30000022900ffffff00000e51000009c300000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  Width: 4944
+  X: 176
+  Y: 76

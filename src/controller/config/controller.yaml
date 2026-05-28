@@ -1,0 +1,388 @@
+file_paths:
+  img_dir: "/home/thanos/Documents/IROS_2026/"
+  poses_dir: "/home/thanos/Documents/IROS_2026/"
+  settings_path: "/home/thanos/Documents/AirSim"
+  gaussians_path: "/home/thanos/Documents/IROS_2026/GaussianSplatting/GaussianSpace/GS_test0/" # Here the .txt and .splat gaussians are saved
+  mesh_path: "/home/thanos/Documents/IROS_2026/RT_meshing/Mesh_Space/RTmesh_test0/"
+flight_params:
+  viewpoint_period: 10.0      # seconds between new viewpoints
+  radius: 5.0                # horizontal radius (m)
+  altitude_z: 5.0            # ENU altitude (m, positive up)
+  cmd_rate_hz: 50.0          # command publish rate
+  camera_pitch_smooth_enabled: true  # If true, camera pitch command moves toward the target gradually instead of jumping instantly.
+  camera_pitch_rate_rps: 0.8         # Maximum camera pitch change rate (rad/s) used for smoothing before sending AirSim camera pose.
+building:
+  # Set active_profile to one of the keys under profiles, or "manual" to use the explicit values below.
+  active_profile: "arc_de_triomphe"
+  profiles:
+    cathedral: {center_x: 0.0, center_y: 6.7, center_z: 5.2, width: 10.5, length: 6.5, height: 12.5}
+    temple: {center_x: 0.0, center_y: 9.0, center_z: 4.25, width: 15.2, length: 9.0, height: 8.6}
+    stonehenge: {center_x: 0.0, center_y: 9.5, center_z: 0.25, width: 15.2, length: 14.5, height: 2.7}
+    stonehenge2: {center_x: 0.0, center_y: 9.3, center_z: 0.25, width: 10.3, length: 11.1, height: 2.7}
+    stonehenge2_wide: {center_x: 0.0, center_y: 9.3, center_z: 0.25, width: 14.8, length: 14.8, height: 2.7}
+    arc_de_triomphe: {center_x: 0.0, center_y: 7.0, center_z: 4.5, width: 8.25, length: 4.4, height: 7.75}
+    statue: {center_x: 0.0, center_y: 6.7, center_z: 5.2, width: 10.5, length: 6.5, height: 12.5}
+    napoleon: {center_x: 0.0, center_y: 5.6, center_z: 2.7, width: 2.0, length: 4.8, height: 5.1}
+  # Center of building in UE4 world coordinates but considering the start position of the drone as the origin:
+  center_x: 0.0
+  center_y: 7.0
+  center_z: 4.25
+  # Physical extents of the building (for choosing radius/height)
+  width: 8.0    # along x
+  length: 4.4   # along y
+  height: 7.5   # along z
+
+side_points:
+  total: 50
+  margin: 1.0
+
+# Switch visualization between Gaussian cloud and RT mesh
+use_mesh: true
+
+rt_meshing:
+  wait_for_controller: true            # If true, RT meshing nodes stay idle until controller_node is running.
+  controller_node_name: "/controller_node" # ROS node name used by the gate check.
+  mesh_target_edge_m: 0.5              # Target triangle edge scale (m) used to initialize face subdivision.
+  include_bottom: true                 # Keep bottom face in the mesh for geometry updates; planning filters near-ground triangles separately.
+  point_stride: 1
+  mesh_viz_period: 1.0
+  mesh_color: [0.92, 0.92, 0.92, 0.6]
+  center_z_offset: 0.0
+  mesh_view_ground_clearance_m: 0.1    # Planner ignores triangles whose centroid lies within this clearance of the bottom face.
+  mesh_view_candidate_ground_clearance_m: 2.0  # Region viewpoint candidates are pulled toward the region centroid until they stay at least this far above the bottom face.
+  mesh_view_sample_hz: 0.03                 # Idle retry rate (Hz) when joint sample+plan loop cannot run yet; successful planning cycles restart immediately after finishing.
+  skip_stationary_pose_entries: true        # If true, still save images but do not append pose/camera entries for near-stationary captures, so SfM and mesh/CVI skip them.
+  stationary_speed_thresh_mps: 0.05         # Translational-speed threshold (m/s) below which a captured frame is treated as stationary for downstream SfM/CVI gating; higher = stricter pose logging.
+  pathing_mode: "atsp" # "baseline_circle"/"initial_round" = one-loop baseline circle, "atsp" = follow planned sampled-view path.
+  baseline_circle_points: 24       # Number of unique viewpoints in the baseline circle; 8 reproduces the old octagon.
+  baseline_circle_continuous: true  # If true, baseline_circle follows a moving circular target instead of stopping at discrete waypoints.
+  baseline_circle_speed_mps: 1.0    # Tangential speed of the moving baseline-circle target.
+  baseline_circle_start_angle_mode: "nearest" # "nearest" starts from the closest circle point to the drone/home; "fixed" uses baseline_circle_start_angle_deg.
+  baseline_circle_start_angle_deg: 0.0 # Fixed start angle around the building center, used only when baseline_circle_start_angle_mode="fixed".
+  baseline_circle_start_tol_m: 0.8  # Horizontal distance tolerance for starting/ending the continuous baseline circle; lower = stricter.
+  baseline_circle_climb_timeout_s: 10.0 # Safety fallback: after this many seconds holding climb altitude, proceed to the circle approach even if odom z is not within tolerance.
+  baseline_circle_stop_after_one_loop: true # Stop after one complete baseline circle and save mission metrics/path.
+  baseline_circle_land_after_one_loop: true # After the one-loop baseline circle, descend/land before saving final metrics/path.
+  mesh_view_debug_logs: true               # Enable verbose ATSP follow logs (hold/target diagnostics).
+  mesh_view_start_leg_debug_enabled: false  # Enable start-leg troubleshooting diagnostics/logs and the red checked-point marker in RViz.
+  mission_completion_progress_logs: false   # Keep console quiet after MISSION_METRICS_STARTED; final metrics still print.
+  mesh_view_follow_reach_only: true         # ATSP mode: advance to next NBV only after current NBV position is reached.
+  mesh_view_reach_pos_tol_m: 0.8            # Position tolerance (m) for "reached" check in ATSP follow mode.
+  mesh_view_sampling_mode: "regions"     # "triangles" = one sample per triangle; "regions" = one sample per connected triangle region.
+  mesh_view_region_count: 15                # Target number of contiguous triangle regions when mesh_view_sampling_mode="regions".
+  mesh_view_region_quantize_eps: 1.0e-6    # Vertex quantization epsilon (m) used to build triangle adjacency for region grouping.
+  mesh_view_region_samples_per_region: 6   # Number of random fan-volume candidates sampled per region; only best-scoring one is kept.
+  mesh_view_region_fan_half_angle_deg: 18.0 # Half-angle (deg) of the fan/cone spread around region outward normal.
+  mesh_view_region_fan_d_max_scale: 1.5    # Fan axial depth range scale: candidate distance in [d_fit, d_fit*this_scale].
+  mesh_view_region_avoid_inside_building: true # Reject region-candidate viewpoints that fall inside the building AABB.
+  mesh_view_region_building_avoid_margin: 0.0 # Extra AABB margin (m) when rejecting inside-building candidate viewpoints.
+  mesh_view_region_boundary_enabled: true  # If true, publish color-coded boundary edges for computed regions in RViz.
+  mesh_view_region_boundary_width: 0.06    # Line width (m) for region boundary edge marker.
+  mesh_view_region_boundary_alpha: 0.95    # Marker alpha for region boundary edge coloring.
+  mesh_view_region_drop_warn_enabled: false # If true, print warning-level diagnostics when a computed region fails to produce a viewpoint.
+  mesh_view_termination_enabled: true      # If true, exclude sufficiently covered triangles from planning and stop when the remaining active fraction is low.
+  mesh_view_termination_cvi_threshold: 1.95 # Effective triangle CVI threshold above which a planner-eligible triangle becomes inactive.
+  mesh_view_termination_active_fraction_epsilon: 0.1 # Stop when active planner-eligible triangles fall below this fraction of all eligible triangles.
+  mesh_view_subsample: 1                   # Use every N-th sampled unit (triangle or region) for sampling (1 = all).
+  mesh_view_subsample_random: false        # If true, randomly keep ~1/N triangles each sampling cycle.
+  mesh_view_d_safe_m: 0.8                  # Minimum camera distance (m) from triangle center along outward normal.
+  mesh_view_fit_margin: 1.05               # Extra margin on FOV fit distance (>1 keeps triangle comfortably in frame).
+  mesh_view_max_samples: 0                 # Hard cap on sampled viewpoints per cycle (0 = no cap).
+  mesh_view_vector_color: [1.0, 0.2, 0.9, 0.9] # RGBA color for sampled viewpoint vectors in RViz.
+  mesh_view_vector_width: 0.03             # Line width (m) of sampled viewpoint vectors in RViz.
+  mesh_view_plan_enabled: true             # Enable CVI-aware ordering (planning) of sampled viewpoints.
+  mesh_view_plan_backend: "lkh"            # Viewpoint-ordering backend: "msgnn" for multi-start greedy nearest-neighbor + 2-opt, "lkh" for external LKH-3 ATSP solve.
+  mesh_view_plan_trans_speed_mps: 1.0      # Global planner linear speed used in d_uv / v_global.
+  mesh_view_plan_rot_speed_rps: 1.0        # Global planner yaw speed used in Δyaw_uv / ωyaw_global.
+  mesh_view_plan_pitch_speed_rps: 0.8      # Shared pitch speed used in Δpitch_uv / ωpitch for local orientation edges.
+  mesh_view_plan_distance_weight: 1.0      # Global weight on d_uv / v_global.
+  mesh_view_plan_yaw_weight: 1.0           # Global weight on Δyaw_uv / ωyaw_global.
+  mesh_view_plan_base_cost: 1.0            # Global constant added to every ATSP edge motion term.
+  mesh_view_plan_cvi_weight: 1.0           # Global weight on the current effective-CVI term.
+  mesh_view_plan_gain_weight: 2.0          # Global weight on the effective-gain term.
+  mesh_view_local_planning_enabled: true   # If true, build and inject the local execution path refinement.
+  mesh_view_local_orientation_enabled: true # If true, locally optimize yaw/pitch along each already-fixed execution path segment.
+  mesh_view_local_orientation_yaw_candidates: 3 # Number of uniformly sampled yaw candidates per path point for local orientation planning.
+  mesh_view_local_orientation_pitch_candidates: 3 # Number of uniformly sampled pitch candidates per path point for local orientation planning.
+  mesh_view_local_orientation_distance_weight: 1.0 # Local weight on d_uv / v.
+  mesh_view_local_orientation_yaw_weight: 1.0 # Local weight on Δyaw_uv / ωyaw.
+  mesh_view_local_orientation_pitch_weight: 1.0 # Local weight on Δpitch_uv / ωpitch.
+  mesh_view_local_orientation_base_cost: 1.0 # Local constant added to every layered-Dijkstra edge motion term.
+  mesh_view_local_orientation_cvi_weight: 1.0 # Local weight on the current effective-CVI term.
+  mesh_view_local_orientation_gain_weight: 2.0 # Local weight on the effective-gain term.
+  mesh_view_local_orientation_yaw_half_span_deg: 20.0 # Horizontal half-span of the local orientation cone around the center-looking direction.
+  mesh_view_local_orientation_pitch_half_span_deg: 20.0 # Vertical half-span of the local orientation cone around the center-looking direction.
+  mesh_view_plan_atsp_multi_start: 8       # Number of initial starts tested by the MSGNN planner before selecting the best route.
+  mesh_view_plan_2opt_enabled: true        # Apply lightweight 2-opt refinement after greedy ordering.
+  mesh_view_plan_2opt_max_nodes: 120       # Skip 2-opt when number of samples exceeds this cap (0 = never cap).
+  mesh_view_plan_2opt_max_iters: 2         # Maximum 2-opt passes per planning cycle.
+  mesh_view_plan_include_start: true       # If true, draw planned trajectory starting from current drone pose.
+  mesh_view_plan_min_cycle_s: 35.0         # Minimum wall-clock time (s) between successful global planning cycles; planner waits if it finishes earlier.
+  mesh_view_velocity_handoff_enabled: true # If true, choose the new-plan executable entry waypoint/direction from current velocity continuity.
+  mesh_view_velocity_handoff_min_speed_mps: 0.05 # Below this speed, fall back to nearest executable waypoint and stored cycle direction.
+  mesh_view_plan_color: [1.0, 0.55, 0.1, 0.9] # RGBA color for planned ordered trajectory marker in RViz.
+  mesh_view_plan_width: 0.05               # Line width (m) for planned ordered trajectory marker.
+  mesh_view_plan_point_color: [0.15, 0.95, 1.0, 0.95] # RGBA color for accepted-viewpoint position spheres drawn along the planned trajectory.
+  mesh_view_plan_point_scale: 0.32         # Sphere diameter (m) for accepted-viewpoint position markers in RViz.
+  mesh_view_plan_lkh_binary: "/home/thanos/Documents/LKH-3.0.13/LKH" # Absolute path to the LKH-3 solver binary used when backend="lkh".
+  mesh_view_plan_lkh_workdir: "/home/thanos/Documents/IROS_2026/RT_meshing/Mesh_Space/RTmesh_test0/lkh_plan" # Directory where controller writes temporary .atsp/.par/.tour files.
+  mesh_view_plan_lkh_scale: 1000           # Float-to-int scale for ATSP edge costs before writing the LKH matrix.
+  mesh_view_plan_lkh_max_candidates: 12    # LKH candidate-set size; higher values usually improve quality but cost more time.
+  mesh_view_plan_lkh_runs: 10              # Number of independent LKH runs per solve request.
+  mesh_view_plan_lkh_max_trials: 10000     # Upper bound on LKH search trials per run.
+  mesh_view_plan_lkh_timeout_s: -1.0       # Wall-clock timeout (s) for a single LKH solve before fallback to MSGNN; set <=0 to disable timeout.
+  mesh_view_plan_lkh_trace_level: 0        # LKH stdout verbosity (0=quiet, 1+=progress output).
+  mesh_view_plan_log_timing: true          # Log controller planner-cycle timing breakdowns.
+  mesh_view_obstacle_mode: "surface_graph" # Obstacle-prep mode: "surface_graph" uses triangle AABBs + full mesh edge graph + segment/mesh intersection prep; "voxel_grid" builds a conservative occupied voxel grid.
+  mesh_view_intersection_quantize_eps: 1.0e-6 # Vertex quantization epsilon (m) used to build the full mesh vertex/edge graph for intersection prep.
+  mesh_view_intersection_bvh_leaf_size: 8 # Triangle count per BVH leaf for directional surface-graph collision queries.
+  mesh_view_surface_graph_astar_alpha_start: 1.0 # Initial radius multiplier for surface-graph A*: keep vertices within alpha * ||P_in-P_out|| of P_in or P_out.
+  mesh_view_surface_graph_astar_alpha_step: 0.5 # If no path is found in the pruned surface graph, increase alpha by this amount and retry until the full graph is covered.
+  mesh_view_surface_graph_clearance_m: 1.5 # Radially push P_in/P_out and surface-graph path vertices away from the building center by this amount before spline fitting.
+  mesh_view_surface_graph_path_spacing_m: 1.0 # Approximate spacing (m) used when sampling straight edges and cubic B-spline detours into execution sub-waypoints.
+  mesh_view_voxel_size_m: 0.25             # Edge length (m) of the planner voxel grid cells.
+  mesh_view_voxel_aabb_margin_m: 3.0       # Extra outer margin (m) added around the current mesh AABB before voxelization.
+  mesh_view_voxel_clearance_m: 0.5         # Inflates each triangle AABB by this clearance (m) before marking occupied voxels.
+  mesh_view_voxel_log_timing: false        # Legacy voxel-only timing toggle; detailed timing now follows mesh_view_obstacle_mode in the planner timing log.
+  # If true, controller re-initializes mesh_latest.npz on startup (zeros tri_cvi, resets IDs/state).
+  reset_mesh_on_start: true
+  align_image_pose_logs_on_shutdown: true # At run end, drop images without pose rows and pose rows whose image file is missing.
+  # CVI updater (separate node: rt_mesh_cvi_node.py)
+  cvi_stride: 7
+  cvi_poll_hz: 5.0
+  cvi_start_at_end: false
+  mesh_cvi_update_mode: "geometric" # Triangle-CVI update mode: "geometric" uses frustum + front-facing geometric scoring, "rasterize" uses rasterized visible-pixel accumulation.
+  cvi_near_eps: 0.001
+  cvi_render_width: 240
+  cvi_render_height: 180
+  cvi_save_debug_images: false
+  cvi_debug_every: 1
+  cvi_debug_dir: "/home/thanos/Documents/IROS_2026/RT_meshing/Mesh_Space/RTmesh_test0/cvi_renders"
+  # Mesh+CVI updater (active node: rt_mesh_cvi_update_node.py)
+  mesh_update_enabled: true                 # Master switch for merged mesh+CVI updater node.
+  geometry_point_source: "depth"              # Geometry support source for mesh updates: "sfm" uses RGB sparse SfM; "depth" uses AirSim DepthPerspective points.
+  mesh_update_sparse_path: "/home/thanos/Documents/IROS_2026/RT_meshing/Mesh_Space/RTmesh_test0/sparse_latest.npz" # Sparse points source for merged updater/reset logic.
+  mesh_update_depth_path: "/home/thanos/Documents/IROS_2026/RT_meshing/Mesh_Space/RTmesh_test0/depth_latest.npz" # Depth point source when geometry_point_source="depth".
+  mesh_update_max_correspondence_dist: 1.0 # Fallback correspondence distance (m) used only when mesh_l0 is unavailable; lower = stricter, set <0 to disable distance rejection.
+  mesh_update_max_corr_l0_weight: 1.25      # With mesh_l0 loaded: max correspondence distance = this_weight * L0; lower = stricter.
+  mesh_split_correspondence_dist: 0.75      # Fallback midpoint support radius (m) used only when mesh_l0 is unavailable; lower = stricter.
+  mesh_split_corr_l0_weight: 0.5            # With mesh_l0 loaded: split support radius = this_weight * L0; lower = stricter.
+  mesh_prune_enabled: true                  # Enable edge-collapse pruning before split in each mesh update cycle.
+  mesh_prune_edge_ratio: 0.2                # Prune edge if its current length is below this_ratio * L0; higher = more aggressive pruning.
+  mesh_prune_min_angle_deg: 8.0             # Also prune sliver triangles by collapsing edge opposite minimum angle below this threshold (deg); higher = stricter sliver pruning.
+  mesh_split_edge_growth_ratio: 0.8         # Split edge if current length > (1 + this_ratio) * L0; higher = stricter splitting.
+  mesh_split_support_min_neighbors: 2       # Minimum sparse neighbors inside split support radius required to accept midpoint split; higher = stricter.
+  mesh_update_intersection_logic_enabled: false # If true, use legacy ray-triangle intersection association; if false, use KNN sparse->vertex fitting.
+  mesh_update_knn_k: 10                        # Number of nearest sparse points queried per visible vertex in KNN mode.
+  mesh_update_knn_min_neighbors: 1            # Minimum accepted neighbors (within max_correspondence_dist) required to update a vertex; higher = stricter.
+  mesh_update_knn_smooth_ring: 1              # Smoothing neighborhood expansion around supported set: 0=T, 1=T+1, 2=T+2.
+  mesh_update_knn_smooth_lambda: 0.2          # Laplacian smoothing strength for KNN mode.
+  mesh_update_knn_smooth_iters: 1             # Number of smoothing iterations in KNN mode.
+  mesh_pseudomerge_enabled: false             # If true, nudge shared edges of nearly coplanar adjacent triangles to reduce tiny normal gaps.
+  mesh_pseudomerge_cos_threshold: 0.985       # Apply pseudo-merge only when adjacent-triangle normal cosine is >= this threshold; higher = stricter.
+  mesh_pseudomerge_step_l0_weight: 0.02       # Pseudo-merge edge shift step = this_weight * L0 (before max-step clamp).
+  mesh_pseudomerge_max_step_m: 0.02           # Maximum pseudo-merge step per accepted edge per iteration (m).
+  mesh_pseudomerge_iters: 1                   # Number of pseudo-merge passes per update cycle.
+  mesh_pseudomerge_visible_only: true         # If true, pseudo-merge only edge-adjacent pairs where both triangles are currently visible.
+  mesh_split_enabled: true                  # Enable edge-midpoint triangle splitting (vertex adjustment still runs when false).
+  mesh_split_max_inserts_per_parent: 4     # Legacy (unused by current edge-midpoint split logic).
+  mesh_split_corner_area_fraction: 0.15    # Corner gate for intersection-mode near-vertex association.
+  mesh_split_bary_dedup_eps: 0.03          # Legacy (unused by current edge-midpoint split logic).
+  mesh_update_quantize_eps: 1.0e-6          # Vertex dedup epsilon (m) for shared-vertex topology construction.
+  mesh_update_vertex_miss_threshold: 3      # Shrink a visible vertex after this many consecutive no-neighbor updates; lower = more aggressive.
+  mesh_update_shrink_step_m: 0.05           # Shrink step (m) toward building center for unsupported visible vertices.
+  mesh_update_rollback_enabled: false       # Safety rollback for flipped/invalid moved triangles; true = stricter geometry safety.
+  mesh_update_min_triangle_area: 1.0e-10    # Reject updates creating near-degenerate triangles; higher = stricter.
+  mesh_conf_ema_alpha: 0.2                  # EMA alpha for touched-vertex confidence updates.
+  mesh_conf_min: 1.0                        # Minimum confidence value.
+  mesh_conf_max: 2.0                        # Maximum confidence value.
+  mesh_conf_reproj_bad_px: 1.0              # Reprojection error at/above this maps to zero reproj score; lower = stricter.
+  mesh_conf_parallax_good_deg: 2.0          # Parallax at/above this maps to full parallax score; higher = stricter.
+  mesh_conf_dist_bad_m: 0.75                # Mesh correspondence distance at/above this maps to zero distance score; lower = stricter.
+  # Sparse geometry point updater (rt_geometry_points_node.py): RGB SfM or fused AirSim depth points.
+  sfm_enabled: true                 # Master switch for the SfM/depth geometry point node.
+  sfm_poll_hz: 5.0                  # How often the node checks for new poses/images.
+  sfm_stride: 2                     # Use every N-th pose/image entry (1 = use all); lower = denser temporal sampling, not stricter.
+  sfm_pose_image_id_offset: -1      # Shift pose entry image ids by this offset when loading images (-1 means pose N uses image N-1).
+  # Start from image_000001 on every launch.
+  sfm_reset_on_start: true          # If true, clear previous sparse output at startup.
+  sfm_skip_existing_poses_on_start: true # If true (with controller gate), ignore pre-existing pose entries at startup to avoid consuming stale runs.
+  # If poses.txt is rewound/truncated while running, reset sparse state.
+  sfm_reset_on_pose_rewind: true    # If pose log resets, restart SfM state too.
+  sfm_window_size: 20               # Rolling keyframe window size.
+  sfm_match_neighbors: 10            # Match new keyframe to last K keyframes; lower = more local matching, higher = more pair attempts.
+  sfm_feature_backend: "sift_klt_alt"  # Feature frontend: orb, sift, klt, sift_orb/orb_sift, orb_klt, sift_klt, sift_klt_alt, or sift_orb_klt/orb_sift_klt.
+  # KLT/grid optical-flow defaults for the online SFM node and evaluator; override from evaluate_sfm_window.py with --klt-* flags when needed.
+  sfm_klt_grid_step: 25             # Grid spacing in pixels for KLT seeding; lower = denser/slower, not stricter.
+  sfm_klt_max_points: 300          # Maximum grid points seeded per KLT keyframe; higher = more candidates, not stricter.
+  sfm_klt_border: 10                 # Border margin in pixels excluded from KLT grid seeding; higher = stricter border exclusion.
+  sfm_klt_win_size: 31              # Lucas-Kanade patch window size in pixels; larger = wider patch, not strictly stricter.
+  sfm_klt_max_level: 3              # Lucas-Kanade pyramid levels; higher = handles larger motion, not stricter.
+  sfm_klt_fb_px: 0.5                # Forward-backward KLT error threshold in pixels; lower = stricter, <=0 disables.
+  sfm_klt_max_error: 10.0           # OpenCV LK tracking error threshold; lower = stricter, <=0 disables.
+  sfm_klt_max_tracks_per_pair: 200 # Maximum KLT tracks kept from one image pair before RANSAC; lower = fewer tracks, not stricter.
+  sfm_gray_normalize: true         # Normalize grayscale intensities before feature detection.
+  sfm_sharpen: true                # Apply unsharp-mask sharpening before feature detection.
+  sfm_sharpen_amount: 0.7          # Unsharp-mask strength.
+  sfm_sharpen_sigma: 1.0           # Gaussian blur sigma used by unsharp mask.
+  sfm_max_features: 300            # Feature cap per detector; higher = more candidates, not stricter.
+  sfm_orb_patch_size: 31           # ORB descriptor patchSize in pixels (OpenCV default is 31); larger = wider descriptor patch, not strictly stricter.
+  sfm_orb_edge_threshold: 31        # ORB border margin in pixels; higher = stricter border exclusion.
+  sfm_min_keypoints: 50             # Minimum detected keypoints to accept image; higher = stricter.
+  sfm_ratio_test: 0.6              # Lowe ratio test threshold (lower = stricter matches).
+  sfm_ransac_px: 0.45                # RANSAC epipolar inlier threshold in pixels; lower = stricter.
+  sfm_min_pair_matches: 50          # Minimum raw good matches before geometry checks; higher = stricter.
+  sfm_min_pair_inliers: 35          # Minimum geometric inliers to triangulate pair; higher = stricter.
+  sfm_min_parallax_deg: 2.5        # Minimum two-view angle for stable triangulation; higher = stricter.
+  sfm_max_reproj_px: 1.25            # Max reprojection error kept for 3D points; lower = stricter.
+  sfm_min_track_views: 2           # Require a point to be confirmed in at least this many keyframes; higher = stricter.
+  sfm_track_confirm_reproj_px: 2  # Reprojection radius (px) used for multi-view confirmation hits; lower = stricter.
+  sfm_near_depth: 0.2              # Minimum positive depth (meters) in both cameras; higher = stricter near-camera rejection.
+  sfm_voxel_size: 0.1              # Merge points in this voxel size (m), 0 disables merge; higher = more merging/less clutter, not stricter.
+  sfm_max_points: 250000            # Hard cap on stored sparse points.
+  sfm_save_every_keyframes: 1       # Save NPZ every N accepted keyframes.
+  sfm_publish_every_keyframes: 1    # Publish point cloud every N accepted keyframes.
+  sfm_enable_motion_gating: false   # Enable min-motion filter between accepted keyframes.
+  sfm_min_translation_m: 0.2        # Motion gate: minimum translation (m); higher = stricter if min-motion gating is enabled.
+  sfm_min_yaw_deg: 5.0              # Motion gate: minimum yaw change (deg); higher = stricter if min-motion gating is enabled.
+  sfm_enable_max_gap_gate: true    # Enable max-motion filter to reject very large jumps.
+  sfm_max_translation_m: 5.0        # Max-gap gate: maximum translation (m); lower = stricter if max-gap gating is enabled.
+  sfm_max_yaw_deg: 60.0             # Max-gap gate: maximum yaw change (deg); lower = stricter if max-gap gating is enabled.
+  sfm_points_topic: "controller/sfm_sparse_points" # Output sparse cloud topic.
+  sfm_frame_id: "odom_local_ned"    # Frame id for published sparse cloud.
+  sfm_output_npz: "/home/thanos/Documents/IROS_2026/RT_meshing/Mesh_Space/RTmesh_test0/sparse_latest.npz" # Persistent sparse output file.
+  depth_output_npz: "/home/thanos/Documents/IROS_2026/RT_meshing/Mesh_Space/RTmesh_test0/depth_latest.npz" # Persistent fused depth point output file.
+  depth_raw_points_topic: "controller/depth_raw_points" # Current RoI-clipped per-frame depth hits before voxel fusion; debug visualization only.
+  depth_source_mode: "ros_topic"   # Depth input when geometry_point_source="depth": "ros_topic" consumes controller-paired capture depth + pose; "saved_frames" polls depth/ + poses.
+  depth_topic: "/airsim_node/drone_1/front_center/DepthPerspective" # AirSim DepthPerspective image stream.
+  depth_camera_pose_topic: "controller/camera_pose" # General controller camera pose visualization topic.
+  depth_capture_topic: "controller/depth_capture" # Controller-paired DepthPerspective frame for each RGB image capture used by online depth geometry.
+  depth_capture_pose_topic: "controller/depth_capture_pose" # Camera pose computed for the same RGB/depth capture and image id.
+  depth_capture_sync_slop_s: 0.1    # Approximate-time window for RGB/depth capture pairing and depth/pose handoff.
+  depth_dir: "/home/thanos/Documents/IROS_2026/depth" # Saved depth folder for depth_source_mode="saved_frames".
+  depth_frame_stride: 3             # Online ros_topic mode attempts paired depth for every Nth RGB image; saved_frames mode processes every Nth saved depth frame.
+  depth_pixel_stride: 5             # Backproject every Nth depth pixel; 1 consumes all valid pixels before voxel fusion.
+  depth_near_m: 0.02                # Ignore pathological non-positive/very-near depth hits; lower = less restrictive.
+  depth_voxel_size: 0.5             # Fused depth voxel edge length (m); larger = fewer geometry support points.
+  depth_min_view_observations: 2    # Minimum distinct depth frames that must observe a voxel before it becomes a usable point.
+  depth_mesh_patching: false       # One-switch experimental depth-patch mode: publish/accumulate depth patch triangles and append them into mesh_latest.npz for CVI/region planning; false returns to old mesh-only planning.
+  depth_mesh_patch_topic: "controller/depth_mesh_patch" # Visualization-only depth patch triangle marker topic.
+  depth_mesh_accumulated_patch_topic: "controller/depth_mesh_accumulated_patch" # Persistent accumulated depth patch triangle marker topic.
+  depth_mesh_patch_boundary_topic: "controller/depth_mesh_patch_boundary" # Visualization-only largest depth patch boundary marker topic.
+  depth_mesh_patch_max_triangles_viz: 50000 # Cap only the RViz triangle marker size; 0 disables cap.
+  depth_mesh_accumulated_patch_max_triangles_viz: 50000 # Cap only the accumulated RViz triangle marker size; 0 disables cap.
+  depth_mesh_patch_edge_rule: "chebyshev" # Patch edge filter: "chebyshev" keeps exact voxel neighbors; "grid"/"long_shadows" keeps old image-grid adjacency.
+  depth_mesh_patch_edge_chebyshev: 1 # Exact Chebyshev voxel distance required when edge_rule="chebyshev"; 1 means immediate 26-neighbor voxels.
+  depth_mesh_patch_intersections_topic: "controller/depth_mesh_patch_intersections" # Dry-run stitching: current-mesh raycast intersection points.
+  depth_mesh_patch_cut_loop_topic: "controller/depth_mesh_patch_cut_loop" # Dry-run stitching: shortest-path cut loop over current mesh.
+  depth_mesh_patch_failed_rays_topic: "controller/depth_mesh_patch_failed_rays" # Dry-run stitching: boundary rays with no current-mesh hit.
+  depth_mesh_patch_cut_diagnostics_enabled: false # If true, run expensive dry-run raycast/cut-loop diagnostics; keep false during normal online runs.
+  depth_mesh_patch_cut_max_boundary_edges: 400 # Cap dry-run boundary edges for raycast/path visualization; lower = faster/debuggier.
+  depth_good_view_observations: 5   # Distinct depth-frame support that saturates the depth view confidence term.
+  depth_good_sample_count: 30       # Raw depth samples fused into a voxel that saturate the depth sample confidence term.
+  depth_view_conf_weight: 0.7       # Depth confidence weight for distinct depth-frame support.
+  depth_sample_conf_weight: 0.3     # Depth confidence weight for raw depth point count within the voxel.
+  depth_fx: 554.2562866210938       # Front-center DepthPerspective fx for the 640x480, 60 deg depth capture in AirSim settings.
+  depth_fy: 554.2562866210938       # Front-center DepthPerspective fy.
+  depth_cx: 320.0                   # Front-center DepthPerspective cx.
+  depth_cy: 240.0                   # Front-center DepthPerspective cy.
+  sfm_clip_to_building: true        # Keep only points inside predefined building bounds; true = stricter spatial filtering.
+  sfm_building_padding: 0.0         # Extra margin (m) added to building bounds; lower = stricter when clipping is enabled.
+  sfm_use_building_roi_mask: true   # Use projected 3D building box as a 2D feature-detection ROI mask.
+  sfm_roi_mask_margin_px: 4         # Expand ROI rectangle by this many pixels on each side; lower = stricter ROI.
+  sfm_roi_mask_fallback_full_image: true # If ROI projection is invalid, use full image instead of dropping frame.
+ # Legacy/old rt_mesh_update_node.py parameters kept for compatibility (unused by current merged mesh+CVI pipeline):
+  mesh_update_poll_hz: 2.0
+  mesh_update_mesh_path: "/home/thanos/Documents/IROS_2026/RT_meshing/Mesh_Space/RTmesh_test0/mesh_latest.npz"
+  mesh_update_reset_state_on_start: true
+  mesh_update_start_at_end: false
+  mesh_update_k_nearest_vertices: 10
+  mesh_update_vertex_ring: 1
+  mesh_update_max_new_points_per_cycle: 1500
+  mesh_update_learning_rate: 0.2
+  mesh_update_max_step_m: 0.04
+  mesh_update_knn_query_chunk: 128
+  mesh_update_temperature_start: 1.0
+  mesh_update_temperature_end: 0.15
+  mesh_update_temperature_decay: 0.995
+  mesh_update_flip_check_enabled: true
+  mesh_update_line_search_min_scale: 0.125
+  mesh_update_laplacian_lambda: 0.0
+calibration:
+    fx: 381.361145
+    fy: 381.361145
+    cx: 320.0
+    cy: 240.0
+    k1: 0.0
+    k2: 0.0
+    p1: 0.0
+    p2: 0.0
+    k3: 0.0
+    width: 640
+    height: 480
+    # depth_scale: 5000.0
+    distorted: False
+    
+gaussian_splatting:
+  # Whether to sort by depth or not (current implementation does it in chunks by sorting the gaussians based on centers). This was needed due to memory
+  depth_sort: False
+  max_depth_gaussians: 4
+  use_color: true
+
+  # At every step the offline training goes through each image one by one
+  offline: False                   # Whether we have data and we want to produce an offline gaussian splat
+  offline_steps: 100             # interpreted as "number of epochs over all images"
+  offline_save_every_epochs: 2    # save every 2 epochs (example)
+  
+  update_interval: 1.0            # seconds between checking for new images
+  initial_training_steps: 100    # your GS budget for initial pass
+  incremental_steps: 100          # steps per set of new images
+  num_init_gaussians: 2000        # initial number of randomized Gaussians
+  initial_log_scale: -4.0         # log scale used to seed initial and spawned Gaussians
+  save_every_new_images: 50       # how many new images before saving txt + splat
+    # Training hyperparameters (for your optimizer)
+  training:
+    learning_rates:
+      position: 1.0e-2
+      scale:    1.0e-2
+      rotation: 1.0e-2
+      color:    1.0e-2
+      opacity:  1.0e-2
+
+    loss_weights:
+      l1:   1.0
+      ssim: 0.2
+
+  # Budget / pruning
+  max_gaussians: 20000           # hard cap, to keep memory bounded
+
+  pruning:
+    opacity_threshold: 0.005 #0.01      # drop very transparent gaussians
+    view_count_threshold: 1      # drop gaussians never seen / used
+    enabled: true
+    threshold: 0.02        # in [0,1] after sigmoid
+    grad_threshold: 0.0    # optional gradient norm gate for pruning
+    interval_steps: 200    # how often to prune (in optimization steps)
+
+  densify:
+    enabled: true
+    start_step: 100
+    interval_steps: 100
+    split_fraction: 0.05
+    max_splits_per_iter: 2048
+    position_jitter: 0.2
+    spawn_fraction: 0.02
+    spawn_alpha_threshold: 0.05
+    target_coverage: 0.6
+
+  saving:
+    save_render_interval_steps: 100    # save every N optimization steps
+    save_dir: "/home/thanos/Documents/IROS_2026/GaussianSplatting/GaussianSpace/Documents_IROS_2026/GS_test0"
+    save_format: "txt"           # "txt" or "npy" depending on your writer
+
+  # Renderer defaults (for both online + offline renderer)
+  renderer:
+    image_width: 640             # from calibration.width
+    image_height: 480            # from calibration.height
+    background_color: [0.0, 0.0, 0.0]
+    tile_size: 16                # for tiled splatting / culling

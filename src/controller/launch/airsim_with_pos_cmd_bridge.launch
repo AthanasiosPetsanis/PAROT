@@ -1,0 +1,11 @@
+<launch>
+  <arg name="vehicle_name" default="drone_1" />
+
+  <!-- Just start the bridge from this workspace -->
+  <node pkg="controller"
+        type="pos_cmd_to_local_goal.py"
+        name="pos_cmd_to_local_goal"
+        output="screen">
+    <param name="vehicle_name" value="$(arg vehicle_name)" />
+  </node>
+</launch>

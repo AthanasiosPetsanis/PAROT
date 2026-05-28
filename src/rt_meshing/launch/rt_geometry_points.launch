@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="rt_meshing" type="rt_geometry_points_node.py" name="rt_geometry_points" output="screen">
+    <rosparam file="$(find controller)/config/controller.yaml" command="load" />
+  </node>
+</launch>
