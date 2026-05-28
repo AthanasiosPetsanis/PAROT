@@ -160,14 +160,6 @@ Typical run outputs include:
 - `RT_meshing/Mesh_Space/.../mesh_latest.npz` - latest mesh/CVI state.
 - `RT_meshing/Mesh_Space/.../sparse_latest.npz` - latest sparse 3D points.
 
-To replay a completed run in RViz:
-
-```bash
-cd ~/Documents/PAROT
-source devel/setup.bash
-roslaunch controller visualize_iros_run_rviz.launch run_dir:=/path/to/run/folder
-```
-
 ## Useful Utilities
 
 - `testing/convert_poses_file.py` converts pose logs for Metashape and WebODM.
